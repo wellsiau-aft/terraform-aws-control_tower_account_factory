@@ -131,6 +131,14 @@ def update_environment_variable(
     }
     __patch(endpoint, headers, payload)
 
+def delete_environment_variable(
+    var_id, workspace_id, api_token
+):
+    endpoint = "{}/workspaces/{}/vars/{}".format(
+        TERRAFORM_API_ENDPOINT, workspace_id, var_id
+    )
+    headers = __build_standard_headers(api_token)
+    __delete(endpoint, headers)
 
 def create_run(workspace_id, cv_id, api_token):
     endpoint = "{}/runs".format(TERRAFORM_API_ENDPOINT)
