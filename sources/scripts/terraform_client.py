@@ -138,7 +138,7 @@ def delete_environment_variable(
         TERRAFORM_API_ENDPOINT, workspace_id, var_id
     )
     headers = __build_standard_headers(api_token)
-    __delete(endpoint, headers)
+    response = __delete(endpoint, headers)
 
 def create_run(workspace_id, cv_id, api_token):
     endpoint = "{}/runs".format(TERRAFORM_API_ENDPOINT)
