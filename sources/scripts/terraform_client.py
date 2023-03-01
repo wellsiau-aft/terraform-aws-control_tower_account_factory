@@ -244,6 +244,7 @@ def __delete(endpoint, headers):
     tf_dist = os.environ.get("TF_DISTRIBUTION")
     response = requests.delete(endpoint, headers=headers, verify=tf_dist != "tfe")
     # __handle_errors(response)
+    print(response)
     return response.json()
 
 
