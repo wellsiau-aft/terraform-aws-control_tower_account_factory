@@ -138,7 +138,7 @@ def delete_environment_variable(
         TERRAFORM_API_ENDPOINT, workspace_id, var_id
     )
     headers = __build_standard_headers(api_token)
-    response = __delete(endpoint, headers)
+    __delete(endpoint, headers)
 
 def create_run(workspace_id, cv_id, api_token):
     endpoint = "{}/runs".format(TERRAFORM_API_ENDPOINT)
@@ -244,9 +244,11 @@ def __delete(endpoint, headers):
     tf_dist = os.environ.get("TF_DISTRIBUTION")
     response = requests.delete(endpoint, headers=headers, verify=tf_dist != "tfe")
     # __handle_errors(response)
-    print(response)
-    return response.json()
-
+    if 204 == response.status_code :
+        #no content
+        return True
+    else:
+        return response.json()
 
 def __handle_errors(response):
     if response is None or response.json() is None or "errors" not in response.json():
