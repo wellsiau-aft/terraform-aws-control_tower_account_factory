@@ -99,7 +99,7 @@ def set_aws_dynamic_credentials(workspace_id, assume_role_arn, role_session_name
             "Enable Dynamic Provider Cred",
             workspace_id,
             False,
-            "terraform",
+            "env",
             api_token,
         )
     else:
@@ -109,7 +109,7 @@ def set_aws_dynamic_credentials(workspace_id, assume_role_arn, role_session_name
             "Enable Dynamic Provider Cred",
             workspace_id,
             False,
-            "terraform",
+            "env",
             api_token,
         )
 
@@ -121,7 +121,7 @@ def set_aws_dynamic_credentials(workspace_id, assume_role_arn, role_session_name
             role_session_name,
             workspace_id,
             False,
-            "terraform",
+            "env",
             api_token,
         )
     else:
@@ -131,7 +131,7 @@ def set_aws_dynamic_credentials(workspace_id, assume_role_arn, role_session_name
             role_session_name,
             workspace_id,
             False,
-            "terraform",
+            "env",
             api_token,
         )
     
