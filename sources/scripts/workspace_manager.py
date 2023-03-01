@@ -58,7 +58,8 @@ def stage_run(workspace_id, assume_role_arn, role_session_name, api_token):
     terraform.wait_to_stabilize(
         "configuration-versions", cv_id, ["uploaded"], api_token
     )
-    set_aws_credentials(workspace_id, assume_role_arn, role_session_name, api_token)
+    #set_aws_credentials(workspace_id, assume_role_arn, role_session_name, api_token)
+    set_aws_dynamic_credentials(workspace_id, assume_role_arn, role_session_name, api_token)
     print(
         "Successfully placed AWS credentials on workspace for {}".format(
             assume_role_arn
@@ -260,9 +261,10 @@ def set_terraform_variables(workspace_id, input_variables, api_token):
 
 
 def stage_destroy(workspace_id, assume_role_arn, assume_role_session_name, api_token):
-    set_aws_credentials(
-        workspace_id, assume_role_arn, assume_role_session_name, api_token
-    )
+    #set_aws_credentials(
+    #    workspace_id, assume_role_arn, assume_role_session_name, api_token
+    #)
+    set_aws_dynamic_credentials(workspace_id, assume_role_arn, assume_role_session_name, api_token)
     run_id = terraform.create_destroy_run(workspace_id, api_token)
     # If in a Run there is no resource change, after execution it will be 'planned_and_finished', which can be a stabilized state
     terraform.wait_to_stabilize(
