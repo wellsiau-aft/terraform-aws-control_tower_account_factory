@@ -319,6 +319,16 @@ variable "terraform_api_endpoint" {
   }
 }
 
+variable "terraform_dynamic_provider_credentials" {
+  description = "Enable Terraform Cloud Dynamic Provider Credentials - valid values are true, false"
+  type        = string
+  default     = true
+  validation {
+    condition     = contains([true, false], var.terraform_dynamic_provider_credentials)
+    error_message = "Valid values for var: terraform_dynamic_provider_credentials are (true, false)."
+  }
+}
+
 #########################################
 # AFT VPC Variables
 #########################################

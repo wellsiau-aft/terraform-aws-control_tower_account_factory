@@ -243,6 +243,7 @@ module "aft_ssm_parameters" {
   terraform_token                                             = var.terraform_token # Null default value #tfsec:ignore:general-secrets-no-plaintext-exposure
   terraform_version                                           = var.terraform_version
   terraform_org_name                                          = var.terraform_org_name
+  terraform_dynamic_provider_credentials                      = var.terraform_dynamic_provider_credentials
   aft_feature_cloudtrail_data_events                          = var.aft_feature_cloudtrail_data_events
   aft_feature_enterprise_support                              = var.aft_feature_enterprise_support
   aft_feature_delete_default_vpcs_enabled                     = var.aft_feature_delete_default_vpcs_enabled
