@@ -22,5 +22,6 @@
           "app.terraform.io:sub": "organization:wellsiau-aft:project:*:workspace:*aft*:run_phase:*"
         }
       }
+    }
   ]
 }
