@@ -11,7 +11,7 @@ terraform {
       configuration_aliases = [aws.ct_management, aws.log_archive, aws.audit, aws.aft_management, aws.tf_backend_secondary_region]
     }
     tls = {
-      source  = "hashicorp/terraform-provider-tls"
+      source  = "hashicorp/tls"
       version = ">= 4.0.0, < 5.0.0"
     }
   }
