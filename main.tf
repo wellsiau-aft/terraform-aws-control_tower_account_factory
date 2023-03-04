@@ -165,8 +165,9 @@ module "aft_iam_roles" {
     aws.log_archive    = aws.log_archive
     aws.aft_management = aws.aft_management
   }
-  terraform_oidc_audience = var.terraform_oidc_audience
-  terraform_oidc_subject  = local.terraform_oidc_subject
+  terraform_oidc_audience                = var.terraform_oidc_audience
+  terraform_oidc_subject                 = local.terraform_oidc_subject
+  terraform_dynamic_provider_credentials = var.terraform_dynamic_provider_credentials
 }
 
 module "aft_lambda_layer" {

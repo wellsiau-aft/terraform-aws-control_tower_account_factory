@@ -7,7 +7,8 @@
         "AWS": "arn:${data_aws_partition_current_partition}:iam::${aft_account_id}:root"
       },
       "Action": "sts:AssumeRole"
-    },
+    }
+    %{ if terraform_dynamic_provider_credentials == "true" },
     {
       "Effect": "Allow",
       "Principal": {
@@ -23,5 +24,6 @@
         }
       }
     }
+    %{ endif }
   ]
 }
