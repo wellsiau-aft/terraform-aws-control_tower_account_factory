@@ -206,19 +206,19 @@ resource "aws_ssm_parameter" "terraform_org_name" {
 }
 
 resource "aws_ssm_parameter" "terraform_dynamic_provider_credentials" {
-  name  = "/aft/config/terraform/dynamic_provider_credentials"
+  name  = "/aft/config/terraform/dynamic-provider-credentials"
   type  = "String"
   value = var.terraform_dynamic_provider_credentials
 }
 
 resource "aws_ssm_parameter" "terraform_oidc_audience" {
-  name  = "/aft/config/terraform/oidc_audience"
+  name  = "/aft/config/terraform/oidc-audience"
   type  = "String"
   value = var.terraform_oidc_audience
 }
 
 resource "aws_ssm_parameter" "terraform_oidc_subject" {
-  name  = "/aft/config/terraform/oidc_subject"
+  name  = "/aft/config/terraform/oidc-subject"
   type  = "String"
   value = var.terraform_oidc_subject
 }
