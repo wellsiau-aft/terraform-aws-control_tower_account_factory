@@ -16,10 +16,10 @@
       "Action": "sts:AssumeRoleWithWebIdentity",
       "Condition": {
         "StringEquals": {
-          "app.terraform.io:aud": "aws.workload.identity"
+          "app.terraform.io:aud": "${terraform_oidc_audience}"
         },
         "StringLike": {
-          "app.terraform.io:sub": "organization:wellsiau-aft:project:*:workspace:*aft*:run_phase:*"
+          "app.terraform.io:sub": "${terraform_oidc_subject}"
         }
       }
     }

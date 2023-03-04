@@ -34,4 +34,5 @@ locals {
     aft_tf_ddb_table_ssm_path                         = "/aft/config/oss-backend/table-id"
     aft_tf_version_ssm_path                           = "/aft/config/terraform/version"
   }
+  terraform_oidc_subject = "organization:${var.terraform_org_name}:${var.terraform_oidc_subject_suffix}"
 }

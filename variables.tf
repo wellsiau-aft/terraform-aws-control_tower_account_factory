@@ -329,6 +329,26 @@ variable "terraform_dynamic_provider_credentials" {
   }
 }
 
+variable "terraform_oidc_audience" {
+  type        = string
+  description = "Terraform Cloud OIDC audience (app.terraform.io:aud) value"
+  default     = "aws.workload.identity"
+  validation {
+    condition     = length(var.terraform_oidc_audience) > 0
+    error_message = "Variable var: terraform_oidc_audience cannot be empty."
+  }
+}
+
+variable "terraform_oidc_subject_suffix" {
+  type        = string
+  description = "Terraform Cloud OIDC subject (app.terraform.io:sub) suffix value, appended after the TFC Org name (organization:)"
+  default     = "project:*:workspace:*aft*:run_phase:*"
+  validation {
+    condition     = length(var.terraform_oidc_subject_suffix) > 0
+    error_message = "Variable var: terraform_oidc_subject_suffix cannot be empty."
+  }
+}
+
 #########################################
 # AFT VPC Variables
 #########################################
