@@ -13,18 +13,18 @@ import terraform_client as terraform
 
 
 def setup_and_run_workspace(
-    organization_name, workspace_name, assume_role_arn, role_session_name, api_token
+    organization_name, workspace_name, assume_role_arn, role_session_name, dynamic_provider_credentials, api_token
 ):
 
     workspace_id = setup_workspace(
-        organization_name, workspace_name, assume_role_arn, role_session_name, api_token
+        organization_name, workspace_name, assume_role_arn, role_session_name, dynamic_provider_credentials, api_token
     )
-    run_id = stage_run(workspace_id, assume_role_arn, role_session_name, api_token)
+    run_id = stage_run(workspace_id, assume_role_arn, role_session_name, dynamic_provider_credentials, api_token)
     return run_id
 
 
 def setup_workspace(
-    organization_name, workspace_name, assume_role_arn, role_session_name, api_token
+    organization_name, workspace_name, assume_role_arn, role_session_name, dynamic_provider_credentials, api_token
 ):
     workspace_id = terraform.create_workspace(
         organization_name, workspace_name, api_token
@@ -34,7 +34,10 @@ def setup_workspace(
             workspace_name, workspace_id
         )
     )
-    set_aws_credentials(workspace_id, assume_role_arn, role_session_name, api_token)
+    if dynamic_provider_credentials: 
+        set_aws_dynamic_credentials(workspace_id, assume_role_arn, role_session_name, api_token)
+    else:
+        set_aws_credentials(workspace_id, assume_role_arn, role_session_name, api_token)
     print(
         "Successfully placed AWS credentials on workspace for {}".format(
             assume_role_arn
@@ -44,7 +47,7 @@ def setup_workspace(
 
 
 # def stage_run(workspace_id, s3_uri, assume_role_arn, api_token):
-def stage_run(workspace_id, assume_role_arn, role_session_name, api_token):
+def stage_run(workspace_id, assume_role_arn, role_session_name, dynamic_provider_credentials, api_token):
     cv_id, upload_url = terraform.create_configuration_version(workspace_id, api_token)
     print("Successfully created a new configuration version: {}".format(cv_id))
     data = open(LOCAL_CONFIGURATION_PATH, "rb")
@@ -57,7 +60,10 @@ def stage_run(workspace_id, assume_role_arn, role_session_name, api_token):
     terraform.wait_to_stabilize(
         "configuration-versions", cv_id, ["uploaded"], api_token
     )
-    set_aws_credentials(workspace_id, assume_role_arn, role_session_name, api_token)
+    if dynamic_provider_credentials: 
+        set_aws_dynamic_credentials(workspace_id, assume_role_arn, role_session_name, api_token)
+    else:
+        set_aws_credentials(workspace_id, assume_role_arn, role_session_name, api_token)
     print(
         "Successfully placed AWS credentials on workspace for {}".format(
             assume_role_arn
@@ -80,6 +86,79 @@ def stage_run(workspace_id, assume_role_arn, role_session_name, api_token):
     )
     return run_id
 
+def set_aws_dynamic_credentials(workspace_id, assume_role_arn, role_session_name, api_token):
+    # find the dynamic cred variables, if not exist, inject it
+    # find static cred variables and delete it
+    # Future use-case 
+    # "TFC_AWS_APPLY_ROLE_ARN"
+    # "TFC_AWS_PLAN_ROLE_ARN"
+
+    current_vars = terraform.get_workspace_vars(workspace_id, api_token)
+    transformed_current_vars_dict = __transform_workspace_vars(current_vars)
+    if "TFC_AWS_PROVIDER_AUTH" in transformed_current_vars_dict:
+        terraform.update_environment_variable(
+            transformed_current_vars_dict["TFC_AWS_PROVIDER_AUTH"],
+            "TFC_AWS_PROVIDER_AUTH",
+            "true",
+            "Enable Dynamic Provider Cred",
+            workspace_id,
+            False,
+            "env",
+            api_token,
+        )
+    else:
+        terraform.set_environment_variable(
+            "TFC_AWS_PROVIDER_AUTH",
+            "true",
+            "Enable Dynamic Provider Cred",
+            workspace_id,
+            False,
+            "env",
+            api_token,
+        )
+
+    if "TFC_AWS_RUN_ROLE_ARN" in transformed_current_vars_dict:
+        terraform.update_environment_variable(
+            transformed_current_vars_dict["TFC_AWS_RUN_ROLE_ARN"],
+            "TFC_AWS_RUN_ROLE_ARN",
+            assume_role_arn,
+            role_session_name,
+            workspace_id,
+            False,
+            "env",
+            api_token,
+        )
+    else:
+        terraform.set_environment_variable(
+            "TFC_AWS_RUN_ROLE_ARN",
+            assume_role_arn,
+            role_session_name,
+            workspace_id,
+            False,
+            "env",
+            api_token,
+        )
+    
+    if "AWS_ACCESS_KEY_ID" in transformed_current_vars_dict:
+        terraform.delete_environment_variable(
+            transformed_current_vars_dict["AWS_ACCESS_KEY_ID"],
+            workspace_id,
+            api_token
+        )
+
+    if "AWS_SECRET_ACCESS_KEY" in transformed_current_vars_dict:
+        terraform.delete_environment_variable(
+            transformed_current_vars_dict["AWS_SECRET_ACCESS_KEY"],
+            workspace_id,
+            api_token
+        )
+
+    if "AWS_SESSION_TOKEN" in transformed_current_vars_dict:
+        terraform.delete_environment_variable(
+            transformed_current_vars_dict["AWS_SESSION_TOKEN"],
+            workspace_id,
+            api_token
+        )
 
 def set_aws_credentials(workspace_id, assume_role_arn, role_session_name, api_token):
     role_credentials = __assume_role(assume_role_arn, role_session_name)
@@ -152,6 +231,19 @@ def set_aws_credentials(workspace_id, assume_role_arn, role_session_name, api_to
             api_token,
         )
 
+    if "TFC_AWS_PROVIDER_AUTH" in transformed_current_vars_dict:
+        terraform.delete_environment_variable(
+            transformed_current_vars_dict["TFC_AWS_PROVIDER_AUTH"],
+            workspace_id,
+            api_token
+        )
+
+    if "TFC_AWS_RUN_ROLE_ARN" in transformed_current_vars_dict:
+        terraform.delete_environment_variable(
+            transformed_current_vars_dict["TFC_AWS_RUN_ROLE_ARN"],
+            workspace_id,
+            api_token
+        )
 
 def set_terraform_variables(workspace_id, input_variables, api_token):
     if input_variables is None:
@@ -185,10 +277,11 @@ def set_terraform_variables(workspace_id, input_variables, api_token):
             )
 
 
-def stage_destroy(workspace_id, assume_role_arn, assume_role_session_name, api_token):
-    set_aws_credentials(
-        workspace_id, assume_role_arn, assume_role_session_name, api_token
-    )
+def stage_destroy(workspace_id, assume_role_arn, assume_role_session_name, dynamic_provider_credentials, api_token):
+    if dynamic_provider_credentials:
+        set_aws_dynamic_credentials(workspace_id, assume_role_arn, assume_role_session_name, api_token)
+    else:
+        set_aws_credentials(workspace_id, assume_role_arn, assume_role_session_name, api_token)
     run_id = terraform.create_destroy_run(workspace_id, api_token)
     # If in a Run there is no resource change, after execution it will be 'planned_and_finished', which can be a stabilized state
     terraform.wait_to_stabilize(
@@ -200,12 +293,12 @@ def stage_destroy(workspace_id, assume_role_arn, assume_role_session_name, api_t
     return run_id
 
 
-def delete_workspace(organization_name, workspace_name, assume_role_arn, api_token):
+def delete_workspace(organization_name, workspace_name, assume_role_arn, dynamic_provider_credentials, api_token):
     workspace_id = terraform.check_workspace_exists(
         organization_name, workspace_name, api_token
     )
     if workspace_id:
-        stage_destroy(workspace_id, assume_role_arn, api_token)
+        stage_destroy(workspace_id, assume_role_arn, dynamic_provider_credentials, api_token)
         terraform.delete_workspace(workspace_id, api_token)
     else:
         print(
@@ -255,12 +348,17 @@ if __name__ == "__main__":
     parser.add_argument("--api_token", type=str, help="Terraform API token")
     parser.add_argument("--terraform_version", type=str, help="Terraform Version")
     parser.add_argument("--config_file", type=str, help="Terraform Config File")
+    parser.add_argument("--dynamic_provider_credentials", type=str, help="Enable Terraform Dynamic Provider Credential")
 
     args = parser.parse_args()
 
     TERRAFORM_API_ENDPOINT = args.api_endpoint
     LOCAL_CONFIGURATION_PATH = args.config_file
     TERRAFORM_VERSION = args.terraform_version
+    if args.dynamic_provider_credentials == "true":
+        args.dynamic_provider_credentials = True
+    else:
+        args.dynamic_provider_credentials = False
 
     terraform.init(TERRAFORM_API_ENDPOINT, TERRAFORM_VERSION, LOCAL_CONFIGURATION_PATH)
 
@@ -269,6 +367,7 @@ if __name__ == "__main__":
             args.organization_name,
             args.workspace_name,
             args.assume_role_arn,
+            args.dynamic_provider_credentials,
             args.api_token,
         )
     elif args.operation == "deploy":
@@ -277,5 +376,6 @@ if __name__ == "__main__":
             args.workspace_name,
             args.assume_role_arn,
             args.assume_role_session_name,
+            args.dynamic_provider_credentials,
             args.api_token,
         )

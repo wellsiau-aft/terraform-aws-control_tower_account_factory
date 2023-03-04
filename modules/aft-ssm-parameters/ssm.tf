@@ -205,6 +205,24 @@ resource "aws_ssm_parameter" "terraform_org_name" {
   value = var.terraform_org_name
 }
 
+resource "aws_ssm_parameter" "terraform_dynamic_provider_credentials" {
+  name  = "/aft/config/terraform/dynamic-provider-credentials"
+  type  = "String"
+  value = var.terraform_dynamic_provider_credentials
+}
+
+resource "aws_ssm_parameter" "terraform_oidc_audience" {
+  name  = "/aft/config/terraform/oidc-audience"
+  type  = "String"
+  value = var.terraform_oidc_audience
+}
+
+resource "aws_ssm_parameter" "terraform_oidc_subject" {
+  name  = "/aft/config/terraform/oidc-subject"
+  type  = "String"
+  value = var.terraform_oidc_subject
+}
+
 resource "aws_ssm_parameter" "aft_execution_role_name" {
   name  = "/aft/resources/iam/aft-execution-role-name"
   type  = "String"

@@ -165,6 +165,10 @@ module "aft_iam_roles" {
     aws.log_archive    = aws.log_archive
     aws.aft_management = aws.aft_management
   }
+  terraform_oidc_audience                = var.terraform_oidc_audience
+  terraform_oidc_subject                 = local.terraform_oidc_subject
+  terraform_dynamic_provider_credentials = var.terraform_dynamic_provider_credentials
+  terraform_api_endpoint                 = var.terraform_api_endpoint
 }
 
 module "aft_lambda_layer" {
@@ -243,6 +247,9 @@ module "aft_ssm_parameters" {
   terraform_token                                             = var.terraform_token # Null default value #tfsec:ignore:general-secrets-no-plaintext-exposure
   terraform_version                                           = var.terraform_version
   terraform_org_name                                          = var.terraform_org_name
+  terraform_dynamic_provider_credentials                      = var.terraform_dynamic_provider_credentials
+  terraform_oidc_audience                                     = var.terraform_oidc_audience
+  terraform_oidc_subject                                      = local.terraform_oidc_subject
   aft_feature_cloudtrail_data_events                          = var.aft_feature_cloudtrail_data_events
   aft_feature_enterprise_support                              = var.aft_feature_enterprise_support
   aft_feature_delete_default_vpcs_enabled                     = var.aft_feature_delete_default_vpcs_enabled

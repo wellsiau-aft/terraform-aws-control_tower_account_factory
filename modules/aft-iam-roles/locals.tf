@@ -2,5 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 locals {
-  aft_admin_assumed_role_arn = "arn:${data.aws_partition.current.partition}:sts::${data.aws_caller_identity.aft_management.account_id}:assumed-role/AWSAFTAdmin/AWSAFT-Session"
+  aft_admin_assumed_role_arn      = "arn:${data.aws_partition.current.partition}:sts::${data.aws_caller_identity.aft_management.account_id}:assumed-role/AWSAFTAdmin/AWSAFT-Session"
+  is_dynamic_provider_credentials = lower(var.terraform_dynamic_provider_credentials) == "true" ? true : false
+  terraform_api_hostname          = split("/", var.terraform_api_endpoint)[2] # example: https://app.terraform.io/api/v2/
 }

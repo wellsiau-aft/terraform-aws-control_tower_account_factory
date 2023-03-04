@@ -6,8 +6,11 @@ resource "aws_iam_role" "aft_admin_role" {
   provider = aws.aft_management
   name     = "AWSAFTAdmin"
   assume_role_policy = templatefile("${path.module}/iam/aft_admin_role_trust_policy.tpl", {
-    aft_account_id                       = data.aws_caller_identity.aft_management.account_id
-    data_aws_partition_current_partition = data.aws_partition.current.partition
+    aft_account_id                         = data.aws_caller_identity.aft_management.account_id
+    data_aws_partition_current_partition   = data.aws_partition.current.partition
+    terraform_dynamic_provider_credentials = var.terraform_dynamic_provider_credentials
+    terraform_oidc_audience                = var.terraform_oidc_audience
+    terraform_oidc_subject                 = var.terraform_oidc_subject
   })
 }
 
