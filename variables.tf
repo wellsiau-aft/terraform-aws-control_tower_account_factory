@@ -321,7 +321,7 @@ variable "terraform_api_endpoint" {
 
 variable "terraform_dynamic_provider_credentials" {
   description = "Enable Terraform Cloud Dynamic Provider Credentials - valid values are true, false"
-  type        = string
+  type        = bool
   default     = true
   validation {
     condition     = contains([true, false], var.terraform_dynamic_provider_credentials)
