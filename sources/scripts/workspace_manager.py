@@ -231,6 +231,19 @@ def set_aws_credentials(workspace_id, assume_role_arn, role_session_name, api_to
             api_token,
         )
 
+    if "TFC_AWS_PROVIDER_AUTH" in transformed_current_vars_dict:
+        terraform.delete_environment_variable(
+            transformed_current_vars_dict["TFC_AWS_PROVIDER_AUTH"],
+            workspace_id,
+            api_token
+        )
+
+    if "TFC_AWS_RUN_ROLE_ARN" in transformed_current_vars_dict:
+        terraform.delete_environment_variable(
+            transformed_current_vars_dict["TFC_AWS_RUN_ROLE_ARN"],
+            workspace_id,
+            api_token
+        )
 
 def set_terraform_variables(workspace_id, input_variables, api_token):
     if input_variables is None:
