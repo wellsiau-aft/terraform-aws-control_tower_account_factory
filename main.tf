@@ -168,6 +168,7 @@ module "aft_iam_roles" {
   terraform_oidc_audience                = var.terraform_oidc_audience
   terraform_oidc_subject                 = local.terraform_oidc_subject
   terraform_dynamic_provider_credentials = var.terraform_dynamic_provider_credentials
+  terraform_api_endpoint                 = var.terraform_api_endpoint
 }
 
 module "aft_lambda_layer" {

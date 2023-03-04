@@ -9,3 +9,7 @@ variable "terraform_oidc_audience" {
 variable "terraform_oidc_subject" {
   type = string
 }
+
+variable "terraform_api_endpoint" {
+  type = string
+}
